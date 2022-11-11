@@ -1,4 +1,9 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿"use strict";
 
-// Write your Javascript code.
+var connection = new signalR.HubConnectionBuilder().withUrl("/WebRTCHub").build();
+
+// TODO Tim: istražiti free WebRTC servere i konfigurisati po tome
+
+// TODO Vedad: Implementacija SignalR metoda na frontendu
+
+// TODO Amar: Review implementiranih metoda, dodavanje dodatne "originalne" funkcijonalnosti

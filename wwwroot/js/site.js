@@ -17,7 +17,7 @@ connection.start().then(function () {
         roomNameTxt.disabled = true;
         createRoomBtn.disabled = true;
         hasRoomJoined = true;
-        connectionStatusMessage.innerText = 'Ušliste u sobu ' + roomId + '. Čekamo ostle...';
+        connectionStatusMessage.innerText = 'Ušliste u sobu ' + roomId + '. Čekamo ostale...';
         myRoomId = roomId;
         isInitiator = true;
     });

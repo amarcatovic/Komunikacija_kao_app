@@ -9,6 +9,8 @@ namespace Komunikacija_kao_app.Hubs
 {
     public class WebRTCHub : Hub
     {
+        private static RoomManager roomManager = new RoomManager();
+
         public override Task OnConnectedAsync()
         {
             return base.OnConnectedAsync();
@@ -19,9 +21,31 @@ namespace Komunikacija_kao_app.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
-        // TODO Vedad: Create Room metoda
+        public async Task CreateRoom(string name)
+        {
+            RoomInfo roomInfo = roomManager.CreateRoom(Context.ConnectionId, name);
+            if (roomInfo != null)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, roomInfo.RoomId);
+                await Clients.Caller.SendAsync("created", roomInfo.RoomId);
+            }
+            else
+            {
+                await Clients.Caller.SendAsync("error", "Greška prilikom pravljenja sobe.");
+            }
+        }
 
-        // TODO Vedad: Join Room metoda
+        public async Task Join(string roomId)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+            await Clients.Caller.SendAsync("joined", roomId);
+            await Clients.Group(roomId).SendAsync("ready");
+
+            if (int.TryParse(roomId, out int id))
+            {
+                roomManager.DeleteRoom(id);
+            }
+        }
 
         // TODO Vedad: Leave Room metoda
 

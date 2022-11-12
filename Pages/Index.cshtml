@@ -1,69 +1,38 @@
-﻿"use strict";
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+@section StyleSheets{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/webrtc.css" type="text/css" />
+}
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/WebRTCHub").build();
+<div class="roomCreate">
+    <label for="name">Room Name:</label>
+    <input type="text" id="roomNameTxt" />
+    <button id="createRoomBtn">Create</button>
+</div>
 
-// u urls treba staviti link servera
-const configuration = {
-    'iceServers': [{
-        'urls': ''
-    }]
-};
-const peerConn = new RTCPeerConnection(configuration);
+<div>
+    <table id="roomTable" class="display" style="width:100%;">
+        <thead>
+            <tr>
+                <th>Room ID</th>
+                <th>Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
 
+<div class="borderLine"></div>
 
-connection.start().then(function () {
-    connection.on('created', function (roomId) {
-        console.log('Soba napravljena', roomId);
-        roomNameTxt.disabled = true;
-        createRoomBtn.disabled = true;
-        hasRoomJoined = true;
-        connectionStatusMessage.innerText = 'Ušliste u sobu ' + roomId + '. Čekamo ostle...';
-        myRoomId = roomId;
-        isInitiator = true;
-    });
-
-    connection.on('joined', function (roomId) {
-        console.log('ID se pridružio sobi: ', roomId);
-        myRoomId = roomId;
-        isInitiator = false;
-    });
-
-    connection.on('error', function (message) {
-        alert(message);
-    });
-}).catch(function (err) {
-    return console.error(err.toString());
-});
-
-    $(createRoomBtn).click(function () {
-        var name = roomNameTxt.value;
-        connection.invoke("CreateRoom", name).catch(function (err) {
-            return console.error(err.toString());
-        });
-    });
-
-$('#roomTable tbody').on('click', 'button', function () {
-    if (hasRoomJoined) {
-        alert('Već ste se pridružili ovoj sobi.');
-    } else {
-        var data = $(roomTable).DataTable().row($(this).parents('tr')).data();
-        connection.invoke("Join", data.RoomId).catch(function (err) {
-            return console.error(err.toString());
-        });
-    }
-});
-
-/*navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-    })
-    .then(gotStream)
-    .catch(function (e) {
-        alert('Greška prilikom učitavanja: ' + e.name);
-    });*/ // vidi radi li tebi, RADI OK
-
-// TODO Tim: istražiti free WebRTC servere i konfigurisati po tome
-
-// TODO Vedad: Implementacija SignalR metoda na frontendu
-
-// TODO Amar: Review implementiranih metoda, dodavanje dodatne "originalne" funkcijonalnosti
+@section Scripts{
+    <script type="text/javascript" src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="~/js/site.js"></script>
+}

@@ -202,7 +202,10 @@ function onDataChannelCreated(channel) {
         fileInput.disabled = false;
     };
 
-    // TODO: možeš li ti ovo pogledati? onclose
+    channel.onclose = function () {
+        console.log('Channel closed.');
+        connectionStatusMessage.innerText = 'Channel closed.';
+    }
 
     channel.onmessage = onReceiveMessageCallback();
 }

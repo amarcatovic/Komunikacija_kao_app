@@ -2,7 +2,7 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/WebRTCHub").build();
 
-// u urls treba staviti link servera
+// backup stun:stun1.l.google.com:19302
 const configuration = {
     'iceServers': [{
         'urls': 'stun:stun.l.google.com:19302'

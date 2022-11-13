@@ -55,10 +55,10 @@ namespace Komunikacija_kao_app.Hubs
 
         public async Task GetRoomInfo()
         {
-            NotifyRoomInfo();
+            await NotifyRoomInfoAsync(true);
         }
 
-        public void NotifyRoomInfo()
+        public async Task NotifyRoomInfoAsync(bool notifyOnlyCaller)
         {
             List<RoomInfo> roomInfos = roomManager.GetAllRoomInfo();
             var list = from room in roomInfos
@@ -66,14 +66,20 @@ namespace Komunikacija_kao_app.Hubs
                        {
                            RoomId = room.RoomId,
                            Name = room.Name,
-                           Button = "<button class=\"joinButton\">Join!</button>"
+                           Button = "<button class=\"joinButton\">Pridruži se!</button>"
                        };
+
             var data = JsonConvert.SerializeObject(list);
+
+            if (notifyOnlyCaller)
+            {
+                await Clients.Caller.SendAsync("updateRoom", data);
+            }
+            else
+            {
+                await Clients.All.SendAsync("updateRoom", data);
+            }
         }
-
-        // TODO Vedad: Leave Room metoda
-
-        // TODO Vedad: Delete Room metoda
 
         // TODO Amar: Napraviti neku dodatnu "originalnu" funkcijonalnost
     }

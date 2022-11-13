@@ -10,6 +10,40 @@ const configuration = {
 };
 const peerConn = new RTCPeerConnection(configuration);
 
+const roomNameTxt = document.getElementById('roomNameTxt');
+const createRoomBtn = document.getElementById('createRoomBtn');
+const roomTable = document.getElementById('roomTable');
+const connectionStatusMessage = document.getElementById('connectionStatusMessage');
+const fileInput = document.getElementById('fileInput');
+const sendFileBtn = document.getElementById('sendFileBtn');
+const fileTable = document.getElementById('fileTable');
+const localVideo = document.getElementById('localVideo');
+const remoteVideo = document.getElementById('remoteVideo');
+
+let myRoomId;
+let localStream;
+let remoteStream;
+let fileReader;
+let isInitiator = false;
+let hasRoomJoined = false;
+
+fileInput.disabled = true;
+sendFileBtn.disabled = true;
+
+$(roomTable).DataTable({
+    columns: [
+        { data: 'RoomId', "width": "30%" },
+        { data: 'Name', "width": "50%" },
+        { data: 'Button', "width": "15%" }
+    ],
+    "lengthChange": false,
+    "searching": false,
+    "language": {
+        "emptyTable": "Nema dostupnih soba!"
+    }
+});
+
+// grabWebCamVideo(); TODO Vedad: Napraviti ovu funkciju
 
 connection.start().then(function () {
     connection.on('created', function (roomId) {
@@ -17,7 +51,7 @@ connection.start().then(function () {
         roomNameTxt.disabled = true;
         createRoomBtn.disabled = true;
         hasRoomJoined = true;
-        connectionStatusMessage.innerText = 'Ušliste u sobu ' + roomId + '. Čekamo ostale...';
+        connectionStatusMessage.innerText = 'Ušli ste u sobu ' + roomId + '. Čekamo ostale...';
         myRoomId = roomId;
         isInitiator = true;
     });
@@ -60,7 +94,7 @@ $('#roomTable tbody').on('click', 'button', function () {
     .then(gotStream)
     .catch(function (e) {
         alert('Greška prilikom učitavanja: ' + e.name);
-    });*/ // vidi radi li tebi, RADI OK
+    });*/
 
 // TODO Tim: istražiti free WebRTC servere i konfigurisati po tome
 

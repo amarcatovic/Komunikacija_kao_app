@@ -70,7 +70,6 @@ public class RoomManager
     {
         rooms.TryRemove(nextRoomId, out _);
 
-        // ovo su ti informacije za pravljenje nove sobe
         var roomInfo = new RoomInfo
         {
             RoomId = nextRoomId.ToString(),
@@ -79,7 +78,6 @@ public class RoomManager
         };
         bool result = rooms.TryAdd(nextRoomId, roomInfo);
 
-        // ako uspije dodati vraća room info inače ništa
         if (result)
         {
             ++nextRoomId;

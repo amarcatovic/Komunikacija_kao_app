@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 
 namespace Komunikacija_kao_app.Hubs
 {
@@ -45,6 +46,29 @@ namespace Komunikacija_kao_app.Hubs
             {
                 roomManager.DeleteRoom(id);
             }
+        }
+
+        public async Task LeaveRoom(string roomId)
+        {
+            await Clients.Group(roomId).SendAsync("bye");
+        }
+
+        public async Task GetRoomInfo()
+        {
+            NotifyRoomInfo();
+        }
+
+        public void NotifyRoomInfo()
+        {
+            List<RoomInfo> roomInfos = roomManager.GetAllRoomInfo();
+            var list = from room in roomInfos
+                       select new
+                       {
+                           RoomId = room.RoomId,
+                           Name = room.Name,
+                           Button = "<button class=\"joinButton\">Join!</button>"
+                       };
+            var data = JsonConvert.SerializeObject(list);
         }
 
         // TODO Vedad: Leave Room metoda

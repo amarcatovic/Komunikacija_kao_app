@@ -5,7 +5,7 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/WebRTCHub").build(
 // u urls treba staviti link servera
 const configuration = {
     'iceServers': [{
-        'urls': ''
+        'urls': 'stun:stun.l.google.com:19302'
     }]
 };
 const peerConn = new RTCPeerConnection(configuration);
@@ -43,7 +43,7 @@ $(roomTable).DataTable({
     }
 });
 
-// grabWebCamVideo(); TODO Vedad: Napraviti ovu funkciju
+grabWebCamVideo();
 
 connection.start().then(function () {
     connection.on('created', function (roomId) {
@@ -65,6 +65,26 @@ connection.start().then(function () {
     connection.on('error', function (message) {
         alert(message);
     });
+
+    connection.on('ready', function () {
+        console.log('ready debbug');
+        roomNameTxt.disabled = true;
+        createRoomBtn.disabled = true;
+        hasRoomJoined = true;
+        connectionStatusMessage.innerText = 'Connecting...';
+        createPeerConnection(isInitiator, configuration);
+    });
+
+    connection.on('message', function (message) {
+        console.log('Klijent primio poruku:', message);
+        signalingMessageCallback(message);
+    });
+
+    connection.on('bye', function () {
+        console.log(`Peer leaving room.`);
+        connectionStatusMessage.innerText = `OStali su izašli iz sobe ${myRoomId}.`;
+    });
+
 }).catch(function (err) {
     return console.error(err.toString());
 });
@@ -87,17 +107,111 @@ $('#roomTable tbody').on('click', 'button', function () {
     }
 });
 
-/*navigator.mediaDevices.getUserMedia({
+function grabWebCamVideo() {
+    console.log('getUserMedia (video) ...');
+    navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true
     })
-    .then(gotStream)
-    .catch(function (e) {
-        alert('Greška prilikom učitavanja: ' + e.name);
-    });*/
+        .then(gotStream)
+        .catch(function (e) {
+            alert('getUserMedia() error: ' + e.name);
+        });
+}
 
-// TODO Tim: istražiti free WebRTC servere i konfigurisati po tome
+function gotStream(stream) {
+    console.log('getUserMedia video stream URL:', stream);
+    localStream = stream;
+    peerConn.addStream(localStream);
+    localVideo.srcObject = stream;
+}
 
-// TODO Vedad: Implementacija SignalR metoda na frontendu
+var dataChannel;
 
-// TODO Amar: Review implementiranih metoda, dodavanje dodatne "originalne" funkcijonalnosti
+function signalingMessageCallback(message) {
+    if (message.type === 'offer') {
+        console.log('Got offer. Sending answer to peer.');
+        peerConn.setRemoteDescription(new RTCSessionDescription(message), function () { },
+            logError);
+        peerConn.createAnswer(onLocalSessionCreated, logError);
+
+    } else if (message.type === 'answer') {
+        console.log('Got answer.');
+        peerConn.setRemoteDescription(new RTCSessionDescription(message), function () { },
+            logError);
+
+    } else if (message.type === 'candidate') {
+        peerConn.addIceCandidate(new RTCIceCandidate({
+            candidate: message.candidate,
+            sdpMLineIndex: message.label,
+            sdpMid: message.id
+        }));
+
+    }
+}
+
+function createPeerConnection(isInitiator, config) {
+    console.log('Creating Peer connection as initiator?', isInitiator, 'config:',
+        config);
+
+    peerConn.onicecandidate = function (event) {
+        console.log('icecandidate event:', event);
+        if (event.candidate) {
+
+        } else {
+            console.log('End of candidates.');
+            sendMessage(peerConn.localDescription);
+        }
+    };
+
+    peerConn.ontrack = function (event) {
+        console.log('icecandidate ontrack event:', event);
+        remoteVideo.srcObject = event.streams[0];
+    };
+
+    if (isInitiator) {
+        console.log('Creating Data Channel');
+        dataChannel = peerConn.createDataChannel('sendDataChannel');
+        onDataChannelCreated(dataChannel);
+
+        console.log('Creating an offer');
+        peerConn.createOffer(onLocalSessionCreated, logError);
+    } else {
+        peerConn.ondatachannel = function (event) {
+            console.log('ondatachannel:', event.channel);
+            dataChannel = event.channel;
+            onDataChannelCreated(dataChannel);
+        };
+    }
+}
+
+function onLocalSessionCreated(desc) {
+    console.log('local session created:', desc);
+    peerConn.setLocalDescription(desc, function () {
+        // Trickle ICE
+        //console.log('sending local desc:', peerConn.localDescription);
+        //sendMessage(peerConn.localDescription);
+    }, logError);
+}
+
+
+function onDataChannelCreated(channel) {
+    channel.onopen = function () {
+        console.log('Channel opened!!!');
+        connectionStatusMessage.innerText = 'Channel opened!!';
+        fileInput.disabled = false;
+    };
+
+    // TODO: možeš li ti ovo pogledati? onclose
+
+    channel.onmessage = onReceiveMessageCallback();
+}
+
+function logError(err) {
+    if (!err) return;
+    if (typeof err === 'string') {
+        console.warn(err);
+    } else {
+        console.warn(err.toString(), err);
+    }
+}

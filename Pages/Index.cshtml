@@ -1,38 +1,65 @@
 ﻿@page
-@model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Početna";
 }
 @section StyleSheets{
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" type="text/css" />
-    <link rel="stylesheet" href="~/css/webrtc.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/site.css" type="text/css" />
 }
 
-<div class="roomCreate">
-    <label for="name">Room Name:</label>
-    <input type="text" id="roomNameTxt" />
-    <button id="createRoomBtn">Create</button>
-</div>
+<div class="mt-3" style="margin: 100px">
+    <div class="roomCreate">
+        <label for="name">Ime sobe:</label>
+        <input type="text" id="roomNameTxt" />
+        <button id="createRoomBtn">Napravi sobu</button>
+    </div>
 
-<div>
-    <table id="roomTable" class="display" style="width:100%;">
-        <thead>
-            <tr>
-                <th>Room ID</th>
-                <th>Name</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</div>
+    <div>
+        <table id="roomTable" class="display" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>ID Sobe</th>
+                    <th>Ime</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 
-<div class="borderLine"></div>
+    <div class="borderLine"></div>
+
+    <div>
+        <div class="connectionStatus">
+            <p id="connectionStatusMessage">*Napravite sobu ili se pridružite nekoj.</p>
+        </div>
+        <h5>Video chat</h5>
+        <div class="videoArea">
+            <video id="localVideo" autoplay playsinline></video>
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+
+        <h5>Dijeljenje datoteka</h5>
+        <div id="fileShare">
+            <input type="file" id="fileInput">
+            <button id="sendFileBtn" class="sendFileBtn">Pošalji</button>
+        </div>
+        <table id="fileTable" class="fileTable">
+            <thead>
+                <tr>
+                    <th>Podijeljene datoteke</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 @section Scripts{
     <script type="text/javascript" src="~/lib/signalr/dist/browser/signalr.js"></script>
     <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="~/js/site.js"></script>
+    <script type="text/javascript" src="~/js/webrtc.js"></script>
 }

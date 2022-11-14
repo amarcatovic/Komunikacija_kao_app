@@ -30,7 +30,7 @@ namespace Komunikacija_kao_app
             });
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSignalR();
         }
 
@@ -42,7 +42,6 @@ namespace Komunikacija_kao_app
             }
             else
             {
-                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
 

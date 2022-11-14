@@ -58,6 +58,11 @@ namespace Komunikacija_kao_app.Hubs
             await NotifyRoomInfoAsync(true);
         }
 
+        public async Task SendMessage(string roomId, object message)
+        {
+            await Clients.OthersInGroup(roomId).SendAsync("message", message);
+        }
+
         public async Task NotifyRoomInfoAsync(bool notifyOnlyCaller)
         {
             List<RoomInfo> roomInfos = roomManager.GetAllRoomInfo();

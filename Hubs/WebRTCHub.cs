@@ -85,8 +85,6 @@ namespace Komunikacija_kao_app.Hubs
                 await Clients.All.SendAsync("updateRoom", data);
             }
         }
-
-        // TODO Amar: Napraviti neku dodatnu "originalnu" funkcijonalnost
     }
 }
 
